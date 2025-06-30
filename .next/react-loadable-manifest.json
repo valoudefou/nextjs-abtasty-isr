@@ -1,1 +1,14 @@
-{}
+{
+  "node_modules/@flagship.io/js-sdk/dist/chunks/browser/esm/nsX90zke.js -> ./DB4bC5Bl.js": {
+    "id": "node_modules/@flagship.io/js-sdk/dist/chunks/browser/esm/nsX90zke.js -> ./DB4bC5Bl.js",
+    "files": [
+      "static/chunks/_pages-dir-browser_node_modules_flagship_io_js-sdk_dist_chunks_browser_esm_DB4bC5Bl_js.js"
+    ]
+  },
+  "node_modules/@flagship.io/js-sdk/dist/chunks/browser/esm/nsX90zke.js -> ./DapSjH90.js": {
+    "id": "node_modules/@flagship.io/js-sdk/dist/chunks/browser/esm/nsX90zke.js -> ./DapSjH90.js",
+    "files": [
+      "static/chunks/_pages-dir-browser_node_modules_flagship_io_js-sdk_dist_chunks_browser_esm_DapSjH90_js.js"
+    ]
+  }
+}
