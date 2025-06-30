@@ -1,11 +1,34 @@
 import React from 'react';
 import { FormProps } from '../types';
+import { useFlagship, HitType, EventCategory } from "@flagship.io/react-sdk";
 
-const FormStep1: React.FC<FormProps> = ({ data, onUpdate, onNext }) => {
+const FormStep1: React.FC<FormProps> = ({ data, onUpdate, onNext, flagBirthField, onToggleFlag }) => {
+  const fs = useFlagship();
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (data.firstName.trim() && data.lastName.trim()) {
       onNext?.();
+    }
+  };
+
+  // Handle toggle with tracking
+  const handleToggle = async () => {
+    try {
+      // Send tracking event for the toggle action
+      await fs.sendHits({
+        type: HitType.EVENT,
+        category: EventCategory.USER_ENGAGEMENT,
+        action: "Toggle Birth Field Flag",
+        label: `Flag set to: ${!flagBirthField}`
+      });
+    } catch (error) {
+      console.error("Tracking failed:", error);
+    }
+    
+    // Call the toggle function from props
+    if (onToggleFlag) {
+      onToggleFlag();
     }
   };
 
@@ -29,16 +52,37 @@ const FormStep1: React.FC<FormProps> = ({ data, onUpdate, onNext }) => {
     width: '100%'
   };
 
-  // Example usage of paymentFeature1Click:
-  // (You can remove or update this part depending on your use case)
-//   const featureMessage = paymentFeature1Click 
-//     ? "Payment Feature 1 is enabled" 
-//     : "Payment Feature 1 is disabled";
+  const toggleButtonStyle = {
+    padding: '0.75rem 1.5rem',
+    border: 'none',
+    borderRadius: '4px',
+    fontSize: '1rem',
+    cursor: 'pointer',
+    marginRight: '1rem'
+  };
 
   return (
     <div>
       <h2>Step 1: Personal Information</h2>
-      {/* <p>{featureMessage}</p> */}
+      
+      {/* Toggle Button for Birth Field Flag */}
+      <div style={{ marginBottom: '1rem' }}>
+        <button
+          type="button"
+          onClick={handleToggle}
+          style={{
+            ...toggleButtonStyle,
+            backgroundColor: flagBirthField ? '#dc3545' : '#007bff',
+            color: 'white'
+          }}
+        >
+          {flagBirthField ? 'Hide Birth Field' : 'Show Birth Field'}
+        </button>
+        <span style={{ marginLeft: '1rem', fontSize: '0.9rem', color: '#666' }}>
+          Birth field is currently: <strong>{flagBirthField ? 'ON' : 'OFF'}</strong>
+        </span>
+      </div>
+
       <form onSubmit={handleSubmit}>
         <div>
           <label htmlFor="firstName">First Name:</label>

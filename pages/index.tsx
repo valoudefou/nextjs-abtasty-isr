@@ -4,7 +4,7 @@ import Layout from '../components/Layout';
 import FormStep1 from '../components/FormStep1';
 import FormStep2 from '../components/FormStep2';
 import { FormData } from '../types';
-import { startFlagshipSDKAsync } from "../startFlagshipSDK"; // ✅ import the helper
+import { startFlagshipSDKAsync } from "../startFlagshipSDK";
 
 interface HomeProps {
   flagBirthField: boolean;
@@ -22,6 +22,9 @@ const Home: React.FC<HomeProps> = ({ flagBirthField, timestamp }) => {
     dateOfBirth: ''
   });
 
+  // Add local state for the flag
+  const [localFlagBirthField, setLocalFlagBirthField] = useState(flagBirthField);
+
   const updateFormData = (field: keyof FormData, value: string) => {
     setFormData(prev => ({
       ...prev,
@@ -32,8 +35,13 @@ const Home: React.FC<HomeProps> = ({ flagBirthField, timestamp }) => {
   const nextStep = () => setCurrentStep(2);
   const previousStep = () => setCurrentStep(1);
 
+  // Toggle function for the flag
+  const toggleFlag = () => {
+    setLocalFlagBirthField(prev => !prev);
+  };
+
   return (
-    <Layout flagBirthField={flagBirthField}>
+    <Layout flagBirthField={localFlagBirthField}>
       <div style={{ marginBottom: '1rem' }}>
         <p style={{ fontSize: '0.9rem', color: '#666' }}>
           Page generated at: {timestamp}
@@ -45,14 +53,16 @@ const Home: React.FC<HomeProps> = ({ flagBirthField, timestamp }) => {
           data={formData}
           onUpdate={updateFormData}
           onNext={nextStep}
-          flagBirthField={flagBirthField}
+          flagBirthField={localFlagBirthField}
+          onToggleFlag={toggleFlag} // Add this prop
         />
       ) : (
         <FormStep2
           data={formData}
           onUpdate={updateFormData}
           onPrevious={previousStep}
-          flagBirthField={flagBirthField}
+          flagBirthField={localFlagBirthField}
+          onToggleFlag={toggleFlag} // Add this prop
         />
       )}
     </Layout>

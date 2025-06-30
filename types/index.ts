@@ -10,5 +10,6 @@ export interface FormProps {
   onUpdate: (field: keyof FormData, value: string) => void;
   onNext?: () => void;
   onPrevious?: () => void;
-  flagBirthField: boolean;  // added this to match your usage
+  flagBirthField: boolean;
+  onToggleFlag?: () => void; // Add this line
 }

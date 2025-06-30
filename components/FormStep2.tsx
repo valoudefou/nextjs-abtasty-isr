@@ -2,7 +2,7 @@ import React from 'react';
 import { FormProps } from '../types';
 import { useFlagship, HitType, EventCategory } from "@flagship.io/react-sdk";
 
-const FormStep2: React.FC<FormProps> = ({ data, onUpdate, onPrevious, flagBirthField }) => {
+const FormStep2: React.FC<FormProps> = ({ data, onUpdate, onPrevious, flagBirthField, onToggleFlag}) => {
   const fs = useFlagship();
   
   const handleSubmit = async (e: React.FormEvent) => {
@@ -19,6 +19,26 @@ const FormStep2: React.FC<FormProps> = ({ data, onUpdate, onPrevious, flagBirthF
     }
 
     alert('Form completed successfully!\n\n' + JSON.stringify(data, null, 2));
+  };
+
+  // Handle toggle with tracking
+  const handleToggle = async () => {
+    try {
+      // Send tracking event for the toggle action
+      await fs.sendHits({
+        type: HitType.EVENT,
+        category: EventCategory.USER_ENGAGEMENT,
+        action: "Toggle Birth Field Flag",
+        label: `Flag set to: ${!flagBirthField}`
+      });
+    } catch (error) {
+      console.error("Tracking failed:", error);
+    }
+    
+    // Call the toggle function from props
+    if (onToggleFlag) {
+      onToggleFlag();
+    }
   };
 
   const inputStyle = {
@@ -45,6 +65,25 @@ const FormStep2: React.FC<FormProps> = ({ data, onUpdate, onPrevious, flagBirthF
   return (
     <div>
       <h2>Step 2: Contact Information</h2>
+      
+      {/* Toggle Button for Birth Field Flag */}
+      <div style={{ marginBottom: '1rem' }}>
+        <button
+          type="button"
+          onClick={handleToggle}
+          style={{
+            ...buttonStyle,
+            backgroundColor: flagBirthField ? '#dc3545' : '#007bff',
+            color: 'white'
+          }}
+        >
+          {flagBirthField ? 'Hide Birth Field' : 'Show Birth Field'}
+        </button>
+        <span style={{ marginLeft: '1rem', fontSize: '0.9rem', color: '#666' }}>
+          Birth field is currently: <strong>{flagBirthField ? 'ON' : 'OFF'}</strong>
+        </span>
+      </div>
+
       <form>
         <div>
           <label htmlFor="email">Email:</label>
