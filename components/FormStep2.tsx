@@ -2,9 +2,9 @@ import React from 'react';
 import { FormProps } from '../types';
 import { useFlagship, HitType, EventCategory } from "@flagship.io/react-sdk";
 
-const FormStep2: React.FC<FormProps> = ({ data, onUpdate, onPrevious, flagBirthField, onToggleFlag}) => {
+const FormStep2: React.FC<FormProps> = ({ data, onUpdate, onPrevious, flagBirthField, onToggleFlag }) => {
   const fs = useFlagship();
-  
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -12,7 +12,7 @@ const FormStep2: React.FC<FormProps> = ({ data, onUpdate, onPrevious, flagBirthF
       await fs.sendHits({
         type: HitType.EVENT,
         category: EventCategory.USER_ENGAGEMENT,
-        action: "Click Complete",
+        action: "Click Complete"
       });
     } catch (error) {
       console.error("Tracking failed:", error);
@@ -21,10 +21,8 @@ const FormStep2: React.FC<FormProps> = ({ data, onUpdate, onPrevious, flagBirthF
     alert('Form completed successfully!\n\n' + JSON.stringify(data, null, 2));
   };
 
-  // Handle toggle with tracking
   const handleToggle = async () => {
     try {
-      // Send tracking event for the toggle action
       await fs.sendHits({
         type: HitType.EVENT,
         category: EventCategory.USER_ENGAGEMENT,
@@ -34,11 +32,8 @@ const FormStep2: React.FC<FormProps> = ({ data, onUpdate, onPrevious, flagBirthF
     } catch (error) {
       console.error("Tracking failed:", error);
     }
-    
-    // Call the toggle function from props
-    if (onToggleFlag) {
-      onToggleFlag();
-    }
+
+    onToggleFlag?.();
   };
 
   const inputStyle = {
@@ -59,13 +54,12 @@ const FormStep2: React.FC<FormProps> = ({ data, onUpdate, onPrevious, flagBirthF
     marginRight: '1rem'
   };
 
-  // Validation: email required; dateOfBirth required only if flagBirthField is true
   const isValid = data.email.trim() && (!flagBirthField || data.dateOfBirth.trim());
 
   return (
     <div>
       <h2>Step 2: Contact Information</h2>
-      
+
       {/* Toggle Button for Birth Field Flag */}
       <div style={{ marginBottom: '1rem' }}>
         <button
@@ -84,7 +78,7 @@ const FormStep2: React.FC<FormProps> = ({ data, onUpdate, onPrevious, flagBirthF
         </span>
       </div>
 
-      <form>
+      <form onSubmit={handleSubmit}>
         <div>
           <label htmlFor="email">Email:</label>
           <input
@@ -113,8 +107,8 @@ const FormStep2: React.FC<FormProps> = ({ data, onUpdate, onPrevious, flagBirthF
         )}
 
         <div style={{ display: 'flex', gap: '1rem' }}>
-          <button 
-            type="button" 
+          <button
+            type="button"
             onClick={onPrevious}
             style={{
               ...buttonStyle,
@@ -126,8 +120,8 @@ const FormStep2: React.FC<FormProps> = ({ data, onUpdate, onPrevious, flagBirthF
             Previous
           </button>
 
-          <button 
-            onClick={handleSubmit}
+          <button
+            type="submit"
             disabled={!isValid}
             style={{
               ...buttonStyle,
@@ -141,9 +135,9 @@ const FormStep2: React.FC<FormProps> = ({ data, onUpdate, onPrevious, flagBirthF
         </div>
       </form>
 
-      <div style={{ 
-        marginTop: '2rem', 
-        padding: '1rem', 
+      <div style={{
+        marginTop: '2rem',
+        padding: '1rem',
         backgroundColor: '#f8f9fa',
         borderRadius: '4px'
       }}>

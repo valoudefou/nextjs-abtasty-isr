@@ -1,15 +1,19 @@
-import type { AppProps } from 'next/app';
-import Head from 'next/head';
+// pages/_app.tsx or _app.jsx
+import { FlagshipProvider } from '@flagship.io/react-sdk'
 
-export default function App({ Component, pageProps }: AppProps) {
+function MyApp({ Component, pageProps }) {
+  const { initialVisitorData, initialFlagsData } = pageProps;
+
   return (
-    <>
-      <Head>
-        <title>Next.js Dynamic Form with Feature Flags</title>
-        <meta name="description" content="A Next.js app with middleware, ISR, and dynamic forms" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-      </Head>
+    <FlagshipProvider
+      envId={process.env.NEXT_PUBLIC_ENV_ID}
+      apiKey={process.env.NEXT_PUBLIC_API_KEY}
+      visitorData={initialVisitorData || {}}
+      initialFlagsData={initialFlagsData}
+    >
       <Component {...pageProps} />
-    </>
+    </FlagshipProvider>
   );
 }
+
+export default MyApp;

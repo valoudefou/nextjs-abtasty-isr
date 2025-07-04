@@ -11,5 +11,6 @@ export interface FormProps {
   onNext?: () => void;
   onPrevious?: () => void;
   flagBirthField: boolean;
-  onToggleFlag?: () => void; // Add this line
+  onToggleFlag: () => void;
+  pageTemplate: string;   // Add this line
 }

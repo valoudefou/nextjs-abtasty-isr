@@ -12,10 +12,8 @@ const FormStep1: React.FC<FormProps> = ({ data, onUpdate, onNext, flagBirthField
     }
   };
 
-  // Handle toggle with tracking
   const handleToggle = async () => {
     try {
-      // Send tracking event for the toggle action
       await fs.sendHits({
         type: HitType.EVENT,
         category: EventCategory.USER_ENGAGEMENT,
@@ -25,11 +23,8 @@ const FormStep1: React.FC<FormProps> = ({ data, onUpdate, onNext, flagBirthField
     } catch (error) {
       console.error("Tracking failed:", error);
     }
-    
-    // Call the toggle function from props
-    if (onToggleFlag) {
-      onToggleFlag();
-    }
+
+    onToggleFlag?.();
   };
 
   const inputStyle = {
@@ -64,8 +59,7 @@ const FormStep1: React.FC<FormProps> = ({ data, onUpdate, onNext, flagBirthField
   return (
     <div>
       <h2>Step 1: Personal Information</h2>
-      
-      {/* Toggle Button for Birth Field Flag */}
+
       <div style={{ marginBottom: '1rem' }}>
         <button
           type="button"
@@ -96,7 +90,7 @@ const FormStep1: React.FC<FormProps> = ({ data, onUpdate, onNext, flagBirthField
             required
           />
         </div>
-        
+
         <div>
           <label htmlFor="lastName">Last Name:</label>
           <input
@@ -109,9 +103,9 @@ const FormStep1: React.FC<FormProps> = ({ data, onUpdate, onNext, flagBirthField
             required
           />
         </div>
-        
-        <button 
-          type="submit" 
+
+        <button
+          type="submit"
           style={buttonStyle}
           disabled={!data.firstName.trim() || !data.lastName.trim()}
         >
