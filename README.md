@@ -191,7 +191,7 @@ export default Home;
 
 This feature enables dynamic control over whether the **Date of Birth** field is displayed in the form, using a feature flag passed to the `FormStep2` component as a prop.
 
-### 🧩 How It Works
+#### 🧩 How It Works
 
 1. **Flag Prop Passed to the Component**
 
