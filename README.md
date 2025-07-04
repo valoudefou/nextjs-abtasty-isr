@@ -187,7 +187,7 @@ export default Home;
 ---
 
 
-## 🎛️ Conditional Display of Birth Field in `FormStep2.tsx`
+### 🎛️ Conditional Display of Birth Field in `FormStep2.tsx`
 
 This feature enables dynamic control over whether the **Date of Birth** field is displayed in the form, using a feature flag passed to the `FormStep2` component as a prop.
 
