@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { GetServerSideProps, GetStaticProps } from 'next';
 import Layout from '../components/Layout';
 import FormStep1 from '../components/FormStep1';
 import FormStep2 from '../components/FormStep2';
@@ -6,21 +7,18 @@ import { FormData } from '../types';
 import { startFlagshipSDKAsync } from "../startFlagshipSDK";
 
 interface HomeProps {
+  flagBirthField: boolean;
   timestamp: string;
+  initialVisitorData: any;
+  initialFlagsData: any;
   pageTemplate: string;
 }
 
-const generateNewVisitorId = () => {
-  return 'visitor_' + Math.random().toString(36).substring(2, 10);
-};
-
-const getVisitorIdFromCookie = () => {
-  if (typeof document === 'undefined') return null;
-  const match = document.cookie.match(new RegExp('(^| )fs_visitor_id=([^;]+)'));
-  return match ? match[2] : null;
-};
-
-const Home: React.FC<HomeProps> = ({ timestamp, pageTemplate }) => {
+const Home: React.FC<HomeProps> = ({
+  flagBirthField,
+  timestamp,
+  pageTemplate,
+}) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<FormData>({
     firstName: '',
@@ -29,30 +27,7 @@ const Home: React.FC<HomeProps> = ({ timestamp, pageTemplate }) => {
     dateOfBirth: ''
   });
 
-  const [flagBirthField, setFlagBirthField] = useState(false);
-  const [localFlagBirthField, setLocalFlagBirthField] = useState(false);
-
-  useEffect(() => {
-    const visitorId = getVisitorIdFromCookie() || generateNewVisitorId();
-
-    async function initFlags() {
-      const flagship = await startFlagshipSDKAsync();
-      const visitor = flagship.newVisitor({
-        visitorId,
-        hasConsented: true,
-        context: {
-          page_template: pageTemplate,
-          user: "me", // add any other user context here
-        },
-      });
-      await visitor.fetchFlags();
-      const flagValue = visitor.getFlag("flagBirthField").getValue(false);
-      setFlagBirthField(flagValue);
-      setLocalFlagBirthField(flagValue);
-    }
-
-    initFlags();
-  }, [pageTemplate]);
+  const [localFlagBirthField, setLocalFlagBirthField] = useState(flagBirthField);
 
   const updateFormData = (field: keyof FormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -96,18 +71,35 @@ const Home: React.FC<HomeProps> = ({ timestamp, pageTemplate }) => {
   );
 };
 
-export const getStaticProps = async ({ req }) => {
-  // You can fetch any general data or fallback flags here, but NOT user-specific
+export const getStaticProps: GetStaticProps = async () => {
+  const flagship = await startFlagshipSDKAsync();
 
-  // Read the template cookie from headers if available (only works server side)
-  const pageTemplate = req?.cookies?.page_template || 'template1';
+  // Use default or fallback visitorId and pageTemplate here
+  const visitorId = undefined;
+  const pageTemplate = 'template1';
+
+  const visitor = flagship.newVisitor({
+    visitorId,
+    hasConsented: true,
+    context: {
+      page_template: pageTemplate,
+      user: "me",
+    },
+  });
+
+  await visitor.fetchFlags();
+
+  const flagBirthField = visitor.getFlag("flagBirthField").getValue(false);
 
   return {
     props: {
+      flagBirthField,
       timestamp: new Date().toISOString(),
+      initialVisitorData: { id: visitor.visitorId },
+      initialFlagsData: visitor.getFlags().toJSON(),
       pageTemplate,
     },
-    revalidate: 60, // Re-generate page every second
+    revalidate: 1,
   };
 };
 

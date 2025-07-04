@@ -20,7 +20,7 @@ export function middleware(req: NextRequest) {
   const userAgent = req.headers.get('user-agent') || '';
   
   // Very simple example: if user-agent contains 'Mobile', assign template1, else template2
-  const template = userAgent.toLowerCase().includes('mobile') ? 'template1' : 'template2';
+  const template = userAgent.toLowerCase().includes('mobile') ? 'template2' : 'template1';
 
   // Set cookie with template info for the page to read
   res.cookies.set('page_template', template, {
