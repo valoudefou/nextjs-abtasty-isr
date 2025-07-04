@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { GetServerSideProps, GetStaticProps } from 'next';
+import { GetStaticProps } from 'next';
 import Layout from '../components/Layout';
 import FormStep1 from '../components/FormStep1';
 import FormStep2 from '../components/FormStep2';

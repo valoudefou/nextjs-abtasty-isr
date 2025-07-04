@@ -1,3 +1,5 @@
+<img src="https://content.partnerpage.io/eyJidWNrZXQiOiJwYXJ0bmVycGFnZS5wcm9kIiwia2V5IjoibWVkaWEvY29udGFjdF9pbWFnZXMvMDUwNGZlYTYtOWIxNy00N2IyLTg1YjUtNmY5YTZjZWU5OTJiLzI1NjhmYjk4LTQwM2ItNGI2OC05NmJiLTE5YTg1MzU3ZjRlMS5wbmciLCJlZGl0cyI6eyJ0b0Zvcm1hdCI6IndlYnAiLCJyZXNpemUiOnsid2lkdGgiOjEyMDAsImhlaWdodCI6NjI3LCJmaXQiOiJjb250YWluIiwiYmFja2dyb3VuZCI6eyJyIjoyNTUsImciOjI1NSwiYiI6MjU1LCJhbHBoYSI6MH19fX0=" alt="AB Tasty logo" width="350"/>
+
 ## 🔩 Flagship SDK + Next.js with ISR
 
 This guide explains how to integrate [AB Tasty's Flagship SDK](https://docs.developers.flagship.io/) in a **Next.js app using Incremental Static Regeneration (ISR)** to optimize feature flagging and experimentation on statically generated pages.
@@ -80,17 +82,21 @@ import Layout from '../components/Layout';
 import FormStep1 from '../components/FormStep1';
 import FormStep2 from '../components/FormStep2';
 import { FormData } from '../types';
-import { HitType, EventCategory } from '@flagship.io/react-sdk';
-import { startFlagshipSDKAsync } from '../startFlagshipSDK';
+import { startFlagshipSDKAsync } from "../startFlagshipSDK";
 
 interface HomeProps {
   flagBirthField: boolean;
   timestamp: string;
   initialVisitorData: any;
   initialFlagsData: any;
+  pageTemplate: string;
 }
 
-const Home: React.FC<HomeProps> = ({ flagBirthField, timestamp }) => {
+const Home: React.FC<HomeProps> = ({
+  flagBirthField,
+  timestamp,
+  pageTemplate,
+}) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<FormData>({
     firstName: '',
@@ -99,26 +105,44 @@ const Home: React.FC<HomeProps> = ({ flagBirthField, timestamp }) => {
     dateOfBirth: ''
   });
 
+  const [localFlagBirthField, setLocalFlagBirthField] = useState(flagBirthField);
+
   const updateFormData = (field: keyof FormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const nextStep = () => setCurrentStep(2);
+  const previousStep = () => setCurrentStep(1);
+
+  const toggleFlag = () => {
+    setLocalFlagBirthField(prev => !prev);
+  };
+
   return (
-    <Layout flagBirthField={flagBirthField}>
-      <p>Page generated at: {timestamp}</p>
+    <Layout flagBirthField={localFlagBirthField} pageTemplate={pageTemplate}>
+      <div style={{ marginBottom: '1rem' }}>
+        <p style={{ fontSize: '0.9rem', color: '#666' }}>
+          Page generated at: {timestamp}
+        </p>
+      </div>
+
       {currentStep === 1 ? (
         <FormStep1
           data={formData}
           onUpdate={updateFormData}
-          onNext={() => setCurrentStep(2)}
-          flagBirthField={flagBirthField}
+          onNext={nextStep}
+          flagBirthField={localFlagBirthField}
+          onToggleFlag={toggleFlag}
+          pageTemplate={pageTemplate}
         />
       ) : (
         <FormStep2
           data={formData}
           onUpdate={updateFormData}
-          onPrevious={() => setCurrentStep(1)}
-          flagBirthField={flagBirthField}
+          onPrevious={previousStep}
+          flagBirthField={localFlagBirthField}
+          onToggleFlag={toggleFlag}
+          pageTemplate={pageTemplate}
         />
       )}
     </Layout>
@@ -128,21 +152,22 @@ const Home: React.FC<HomeProps> = ({ flagBirthField, timestamp }) => {
 export const getStaticProps: GetStaticProps = async () => {
   const flagship = await startFlagshipSDKAsync();
 
+  // Use default or fallback visitorId and pageTemplate here
+  const visitorId = undefined;
+  const pageTemplate = 'template1';
+
   const visitor = flagship.newVisitor({
-    visitorId: 'static-visitor-id',
+    visitorId,
     hasConsented: true,
-    context: {},
+    context: {
+      page_template: pageTemplate,
+      user: "me",
+    },
   });
 
   await visitor.fetchFlags();
 
-  const flagBirthField = visitor.getFlag("flagBirthField").getValue(true);
-
-  await visitor.sendHit({
-    type: HitType.EVENT,
-    category: EventCategory.ACTION_TRACKING,
-    action: "page viewed",
-  });
+  const flagBirthField = visitor.getFlag("flagBirthField").getValue(false);
 
   return {
     props: {
@@ -150,8 +175,9 @@ export const getStaticProps: GetStaticProps = async () => {
       timestamp: new Date().toISOString(),
       initialVisitorData: { id: visitor.visitorId },
       initialFlagsData: visitor.getFlags().toJSON(),
+      pageTemplate,
     },
-    revalidate: 60,
+    revalidate: 1,
   };
 };
 
@@ -192,7 +218,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 
 ---
 
-### 🔄 How ISR Works Here
+### ⚙️ How ISR Works Here
 
 - `getStaticProps` is executed at **build time** and then **periodically re-run** based on the `revalidate` setting.
 - The Flagship SDK is initialized server-side.
@@ -205,3 +231,12 @@ const handleSubmit = async (e: React.FormEvent) => {
 - Use `getStaticProps` + `revalidate` for performance and near-real-time updates.
 - You can also integrate `getServerSideProps` for user-specific personalization.
 - For dynamic `visitorId`, consider generating one based on a hash of IP/User-Agent or from cookies.
+
+---
+
+### 🔄 Latest Update
+
+- Previously, `getServerSideProps` was used to fetch visitor flags on every request, impacting performance and scalability.
+- The approach has been switched to `getStaticProps` with ISR, configured to revalidate every second (`revalidate: 1`).
+- This means pages are statically generated at build time and regenerated in the background at most once per second, balancing performance and near-real-time freshness.
+- For user-specific personalization, combine ISR with client-side fetching or cookies.
