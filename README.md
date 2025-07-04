@@ -186,6 +186,49 @@ export default Home;
 
 ---
 
+
+## 🎛️ Conditional Display of Birth Field in `FormStep2.tsx`
+
+This feature enables dynamic control over whether the **Date of Birth** field is displayed in the form, using a feature flag passed to the `FormStep2` component as a prop.
+
+### 🧩 How It Works
+
+1. **Flag Prop Passed to the Component**
+
+   The `FormStep2.tsx` component receives a prop named `flagBirthField` (a `boolean`) that determines whether the birth field should be shown. This flag can be set at the page level using `getStaticProps`, `getServerSideProps`, or manually passed when rendering the component.
+
+   Example:
+   ```tsx
+   <FormStep2
+     data={formData}
+     onUpdate={handleUpdate}
+     onPrevious={goBack}
+     flagBirthField={true} // or dynamically fetched value
+     onToggleFlag={toggleBirthFieldFlag}
+   />
+   ```
+
+2. **Conditional Rendering in the Component**
+
+   Inside `FormStep2.tsx`, the birth field is conditionally displayed using a simple `if` check:
+
+   ```tsx
+   {flagBirthField && (
+     <div>
+       <label htmlFor="dateOfBirth">Date of Birth:</label>
+       <input
+         id="dateOfBirth"
+         type="date"
+         value={data.dateOfBirth}
+         onChange={(e) => onUpdate('dateOfBirth', e.target.value)}
+         style={inputStyle}
+         required
+       />
+     </div>
+   )}
+   ```
+---
+
 ### 🧪 Tracking User Actions on Form Completion
 
 In `FormStep2.tsx`, send a hit event when the user completes the form:
