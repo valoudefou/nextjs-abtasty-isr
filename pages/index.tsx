@@ -99,7 +99,7 @@ export const getStaticProps: GetStaticProps = async () => {
       initialFlagsData: visitor.getFlags().toJSON(),
       pageTemplate,
     },
-    revalidate: 1,
+    revalidate: 60,
   };
 };
 

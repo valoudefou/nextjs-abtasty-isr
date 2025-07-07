@@ -177,7 +177,7 @@ export const getStaticProps: GetStaticProps = async () => {
       initialFlagsData: visitor.getFlags().toJSON(),
       pageTemplate,
     },
-    revalidate: 1,
+    revalidate: 60,
   };
 };
 
@@ -280,6 +280,6 @@ const handleSubmit = async (e: React.FormEvent) => {
 ### 🔄 Latest Update
 
 - Previously, `getServerSideProps` was used to fetch visitor flags on every request, impacting performance and scalability.
-- The approach has been switched to `getStaticProps` with ISR, configured to revalidate every second (`revalidate: 1`).
+- The approach has been switched to `getStaticProps` with ISR, configured to revalidate every 60 seconds (`revalidate: 60`).
 - This means pages are statically generated at build time and regenerated in the background at most once per second, balancing performance and near-real-time freshness.
 - For user-specific personalization, combine ISR with client-side fetching or cookies.
