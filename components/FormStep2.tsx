@@ -14,6 +14,7 @@ const FormStep2: React.FC<FormProps> = ({ data, onUpdate, onPrevious, flagBirthF
         category: EventCategory.USER_ENGAGEMENT,
         action: "Click Complete"
       });
+       console.log(fs.hasConsented); // Successfully sent
     } catch (error) {
       console.error("Tracking failed:", error);
     }
